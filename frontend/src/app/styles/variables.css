@@ -1,0 +1,21 @@
+:root {
+  /* Фоны */
+  --color-bg-main: #1e1e1e;      /* Общий фон приложения */
+  --color-bg-panel: #2a2a2a;     /* Фон карточек и панелей */
+  --color-bg-input: #333333;     /* Фон полей ввода */
+
+  /* Акценты (фиолетовый) */
+  --color-accent: #7c4dff;       /* Основной фиолетовый */
+  --color-accent-hover: #9575ff; /* При наведении */
+  --color-accent-muted: #4a3673; /* Для границ карточек */
+
+  /* Текст */
+  --color-text-main: #ffffff;
+  --color-text-muted: #a0a0a0;
+
+  /* Границы */
+  --color-border: #3d3d3d;
+
+  /* Статусы */
+  --color-danger: #e53935;       /* Запись/Удаление */
+}

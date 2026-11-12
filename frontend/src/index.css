@@ -1,0 +1,12 @@
+@import './app/styles/variables.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-family: system-ui, -apple-system, sans-serif;
+}
