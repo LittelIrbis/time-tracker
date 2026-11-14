@@ -1,65 +1,145 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTasks, createTask } from '../../shared/api/tasks'; // Убедись, что путь правильный!
-import { formatDuration } from '../../shared/utils/time';
+import { getTasks, createTask } from '../../shared/api/tasks';
 
 export function TimerPanel() {
   const queryClient = useQueryClient();
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTaskName, setSelectedTaskName] = useState<string | null>(null);
-  
-  // Загружаем все задачи (пока без фильтрации по проектам)
-  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: getTasks });
+  const [isRunning, setIsRunning] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  // Берем последние 5 уникальных задач
+  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: getTasks });
   const recentTasks = Array.from(new Set(tasks.map(t => t.name))).slice(0, 5);
 
-  // Мутация для создания новой задачи (старта таймера)
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setElapsedSeconds(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  const formatTime = (totalSeconds: number) => {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
   const startMutation = useMutation({
     mutationFn: (name: string) => createTask({ name, start: new Date().toISOString(), end: null }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      setSelectedTaskName(null); // Сбрасываем выбор после старта
     }
   });
 
+  const handleStart = () => {
+    if (!selectedTaskName) return;
+    startMutation.mutate(selectedTaskName, {
+      onSuccess: () => {
+        setIsRunning(true);
+        setElapsedSeconds(0);
+      }
+    });
+  };
+
+  const handleStop = () => {
+    setIsRunning(false);
+  };
+
+  const handleReset = () => {
+    if (isRunning) return;
+    setSelectedTaskName(null);
+    setElapsedSeconds(0);
+  };
+
+  // Определяем состояние (1, 2 или 3)
+  const state = isRunning ? 3 : (selectedTaskName ? 2 : 1);
+
+  // Выбираем переменные цвета в зависимости от состояния
+  let cardBgVar, inputBgVar;
+  if (state === 3) {
+    cardBgVar = 'var(--timer-bg-running)';
+    inputBgVar = 'var(--timer-input-bg-running)';
+  } else if (state === 2) {
+    cardBgVar = 'var(--timer-bg-selected)';
+    inputBgVar = 'var(--timer-input-bg-selected)';
+  } else {
+    cardBgVar = 'var(--timer-bg-idle)';
+    inputBgVar = 'var(--timer-input-bg-idle)';
+  }
+
   return (
     <div style={{
-      background: 'var(--color-bg-panel)',
-      border: '1px solid var(--color-accent-muted)',
+      background: cardBgVar,
+      border: '3px solid var(--color-accent-muted)',
       borderRadius: '12px',
       padding: '1.5rem',
       display: 'flex',
       flexDirection: 'column',
       gap: '1rem',
-      position: 'relative'
+      position: 'relative',
+      transition: 'background 0.3s ease',
+      width: '100%',
+      aspectRatio: '1 / 1',
+      boxSizing: 'border-box',
     }}>
-      {/* Поле выбора задачи (выглядит как инпут, но это кнопка) */}
+      
+      {/* ШАПКА КАРТОЧКИ */}
       <div 
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onClick={() => {
+          if (isRunning) return;
+          if (selectedTaskName) {
+            handleReset();
+          } else {
+            setIsDropdownOpen(!isDropdownOpen);
+          }
+        }}
         style={{
-          background: 'var(--color-bg-input)',
+          background: inputBgVar,
           border: '1px solid var(--color-border)',
           borderRadius: '8px',
           padding: '0.75rem',
-          cursor: 'pointer',
-          color: selectedTaskName ? 'var(--color-text-main)' : 'var(--color-text-muted)'
+          cursor: isRunning ? 'default' : 'pointer',
+          color: selectedTaskName ? 'var(--color-text-main)' : 'var(--color-text-muted)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          transition: 'background 0.3s ease'
         }}
       >
-        {selectedTaskName || '● task_name'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {selectedTaskName && (
+            <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--color-accent)' }} />
+          )}
+          <span>{selectedTaskName || 'Новая задача'}</span>
+        </div>
+        
+        {!isRunning && (
+          <span>{selectedTaskName ? '✕' : '▼'}</span>
+        )}
       </div>
 
-      {/* Выпадающий список */}
-      {isDropdownOpen && (
+      {/* ВЫПАДАЮЩИЙ СПИСОК */}
+      {isDropdownOpen && !isRunning && !selectedTaskName && (
         <div style={{
           position: 'absolute',
-          top: '4rem', left: '1.5rem', right: '1.5rem',
-          background: 'var(--color-bg-input)',
+          top: '4.2rem', left: '1.5rem', right: '1.5rem',
+          background: 'var(--color-bg-input)', // Оставляем базовый темный фон для списка
           border: '1px solid var(--color-border)',
           borderRadius: '8px',
           zIndex: 10,
           overflow: 'hidden'
         }}>
+          {recentTasks.length === 0 && (
+            <div style={{ padding: '0.5rem 1rem', color: 'var(--color-text-muted)' }}>
+              Нет недавних задач
+            </div>
+          )}
           {recentTasks.map(taskName => (
             <div 
               key={taskName}
@@ -87,28 +167,63 @@ export function TimerPanel() {
         </div>
       )}
 
-      {/* Кнопка Старт */}
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem 0' }}>
-        <button
-          disabled={!selectedTaskName || startMutation.isPending}
-          onClick={() => selectedTaskName && startMutation.mutate(selectedTaskName)}
-          style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%', // Круглая кнопка как в макете
-            background: selectedTaskName ? 'var(--color-accent)' : 'var(--color-bg-input)',
-            border: 'none',
-            cursor: selectedTaskName ? 'pointer' : 'default',
-            color: '#fff',
-            fontSize: '2rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'background 0.2s'
-          }}
-        >
-          {startMutation.isPending ? '⏳' : '▶'}
-        </button>
+      {/* ТАЙМЕР */}
+      {(state === 2 || state === 3) && (
+        <div style={{
+          fontSize: '3.5rem',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          color: 'var(--color-text-main)',
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '2px',
+          margin: '1rem 0'
+        }}>
+          {formatTime(elapsedSeconds)}
+        </div>
+      )}
+
+            {/* КНОПКИ УПРАВЛЕНИЯ */}
+      <div style={{ 
+        flex: 1,                 // Занимает всё оставшееся место по центру
+        display: 'flex', 
+        alignItems: 'center',    // Центрируем кнопки по вертикали
+        justifyContent: 'center', 
+        paddingBottom: '0.5rem' 
+      }}>
+        {/* Пустышка для состояния 1 (чтобы карточка не прыгала) */}
+        {state === 1 && <div />}
+
+        {/* Кнопка Старт (состояние 2) */}
+        {state === 2 && (
+          <button
+            onClick={handleStart}
+            disabled={startMutation.isPending}
+            style={{
+              width: '80px', height: '80px', borderRadius: '50%',
+              background: 'var(--color-accent)', border: 'none',
+              cursor: 'pointer', color: '#fff', fontSize: '2rem',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            {startMutation.isPending ? '⏳' : '▶'}
+          </button>
+        )}
+
+        {/* Кнопка Стоп (состояние 3) */}
+        {state === 3 && (
+          <button
+            onClick={handleStop}
+            style={{
+              width: '80px', height: '80px', borderRadius: '50%',
+              background: 'var(--color-accent-blue)',
+              border: 'none',
+              cursor: 'pointer', color: '#fff', fontSize: '2rem',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            ⏹
+          </button>
+        )}
       </div>
     </div>
   );

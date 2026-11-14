@@ -8,27 +8,25 @@ function App() {
     // Главный контейнер на весь экран
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       
-      {/* 1. Сайтбар слева (заглушка) */}
       <Sidebar />
 
-      {/* 2. Основная рабочая область */}
       <main
-        style={{
-          flex: 1, // занимает всё оставшееся место
+        style = {{
+          flex: 1,
           padding: '2rem',
           display: 'grid',
-          // Две колонки: левая фиксированная 350px, правая - резиновая (1fr)
+          
           gridTemplateColumns: '350px 1fr',
           gap: '2rem',
-          alignItems: 'start', // чтобы карточки не растягивались по высоте
+          alignItems: 'start',
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* Карточка "Новая активность" */}
+        {/* left column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* new activity */}
           <TimerPanel />
 
-          {/* Блок "Задачи" (пока заглушка, но потом сюда придет список) */}
+          {/* Блок "Задачи"*/}
           <div
             style={{
               background: 'var(--color-bg-panel)',
@@ -53,12 +51,12 @@ function App() {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА */}
+        {/* right column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Блок статистики */}
           <StatsPlaceholder />
 
-          {/* Блок записей (лента) */}
+          {/* Блок записей*/}
           <RecordsPlaceholder />
         </div>
       </main>

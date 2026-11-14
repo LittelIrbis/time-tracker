@@ -18,4 +18,18 @@
 
   /* Статусы */
   --color-danger: #e53935;       /* Запись/Удаление */
+  --color-accent-blue: #5560ff; /* Синий для кнопки стоп */
+
+  /* СОСТОЯНИЯ КАРТОЧКИ ТАЙМЕРА */
+  /* Состояние 1: ничего не выбрано */
+  --timer-bg-idle: var(--color-bg-panel);
+  --timer-input-bg-idle: var(--color-bg-input);
+
+  /* Состояние 2: задача выбрана, но таймер не запущен (светло-серый) */
+  --timer-bg-selected: #9575ff19;
+  --timer-input-bg-selected: #9575ff27;
+
+  /* Состояние 3: таймер запущен (фиолетовый) */
+  --timer-bg-running: rgba(99, 68, 255, 0.164);
+  --timer-input-bg-running: rgba(99, 68, 255, 0.164);
 }
