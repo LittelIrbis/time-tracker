@@ -6,8 +6,7 @@ interface TaskRowProps {
   task: Task;
 }
 
-export function TaskRow(props: TaskRowProps) {
-  const task = props.task;
+export function TaskRow({ task }: TaskRowProps) {
   const isActive = task.end === null;
 
   return (
@@ -17,32 +16,25 @@ export function TaskRow(props: TaskRowProps) {
         gridTemplateColumns: '80px 1fr auto',
         alignItems: 'center',
         padding: '0.75rem 1rem',
-        borderBottom: '1px solid #a0a0a0bc',
+        borderBottom: '1px solid var(--color-border)',
         gap: '1rem',
+        fontSize: '0.95rem',
       }}
     >
-      <span style={{ color: '#666666', fontSize: '0.9rem' }}>
+      {/* Время начала */}
+      <span style={{ color: 'var(--color-text-muted)' }}>
         {formatTime(task.start)}
       </span>
 
-      <span style={{ fontWeight: isActive ? 600 : 400 }}>
+      {/* Название задачи */}
+      <span style={{ fontWeight: isActive ? 600 : 400, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Кружочек проекта (фиолетовый) */}
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-accent)' }} />
         {task.name}
-        {isActive && (
-          <span
-            style={{
-              display: 'inline-block',
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: '#327c46',
-              marginLeft: '0.5rem',
-            }}
-            title="Идёт сейчас"
-          />
-        )}
       </span>
 
-      <span style={{ fontVariantNumeric: 'tabular-nums', color: '#333' }}>
+      {/* Длительность */}
+      <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-main)' }}>
         <LiveDuration start={task.start} end={task.end} />
       </span>
     </div>

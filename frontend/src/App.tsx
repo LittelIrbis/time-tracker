@@ -1,12 +1,13 @@
 import { Sidebar } from './features/navigation/Sidebar';
 import { TimerPanel } from './features/timer/TimerPanel';
 import { StatsPlaceholder } from './features/stats/StatsPlaceholder';
-import { RecordsPlaceholder } from './features/tasks/RecordsPlaceholder';
+import { RecordsList } from './features/tasks/RecordsList';
+import { TasksToDo } from './features/tasks/TasksToDo';
 
 function App() {
   return (
     // Главный контейнер на весь экран
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', height: '100vh', }}>
       
       <Sidebar />
 
@@ -15,49 +16,39 @@ function App() {
           flex: 1,
           padding: '2rem',
           display: 'grid',
-          
+          height: '100vh',
           gridTemplateColumns: '350px 1fr',
           gap: '2rem',
-          alignItems: 'start',
+          //alignItems: 'start',
+          overflow: 'hidden',
         }}
       >
-        {/* left column */}
+        {/* left column -------------------------- */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* new activity */}
           <TimerPanel />
 
-          {/* Блок "Задачи"*/}
-          <div
-            style={{
-              background: 'var(--color-bg-panel)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              minHeight: '200px',
-            }}
-          >
-            <h2
-              style={{
-                margin: '0 0 1rem 0',
-                color: 'var(--color-accent)',
-                fontSize: '1.2rem',
-              }}
-            >
-              Задачи
-            </h2>
-            <p style={{ color: 'var(--color-text-muted)' }}>
-              Список активных задач появится здесь.
-            </p>
-          </div>
+          <TasksToDo />
         </div>
 
-        {/* right column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+        {/* right column -----------------*/}
+        <div style={{ display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+          height: '100%',       
+          minHeight: 0,         
+          overflow: 'hidden'
+        }}>
           {/* Блок статистики */}
-          <StatsPlaceholder />
+          <div style={{width: '100%', flexShrink: 0 }}>
+            <StatsPlaceholder />
+          </div>
 
           {/* Блок записей*/}
-          <RecordsPlaceholder />
+          <div style={{ flex: 1, minHeight: 0, width: '100%'  }}>
+            <RecordsList />
+          </div>
         </div>
       </main>
     </div>

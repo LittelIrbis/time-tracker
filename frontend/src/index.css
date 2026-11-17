@@ -10,3 +10,21 @@ body {
   color: var(--color-text-main);
   font-family: system-ui, -apple-system, sans-serif;
 }
+
+
+::-webkit-scrollbar {
+  width: 8px; /* Ширина ползунка */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Фон дорожки (прозрачный) */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border); /* Цвет ползунка (тёмно-серый) */
+  border-radius: 10px; /* Скругление */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted); /* Чуть светлее при наведении */
+}
