@@ -1,57 +1,33 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Sidebar } from '../features/navigation/Sidebar';
-import { TimerPanel } from '../features/timer/TimerPanel';
-import { StatsPlaceholder } from '../features/stats/StatsPlaceholder';
-import { RecordsList } from '../features/tasks/RecordsList';
-import { TasksToDo } from '../features/tasks/TasksToDo';
+import { DashboardPage } from '../pages/DashboardPage';
+import { StatisticsPage } from '../pages/StatisticsPage';
+import { TasksPage } from '../pages/TasksPage';
+import { ProjectsPage } from '../pages/ProjectsPage';
+import { SettingsPage } from '../pages/SettingsPage';
 
 function App() {
   return (
-    // Главный контейнер на весь экран
-    <div style={{ display: 'flex', height: '100vh', }}>
-      
-      <Sidebar />
+    <BrowserRouter>
+      <div style={{ display: 'flex', height: '100vh', background: 'var(--color-bg-main)' }}>
+        
+        {/* Сайтбар всегда слева */}
+        <Sidebar />
 
-      <main
-        style = {{
-          flex: 1,
-          padding: '2rem',
-          display: 'grid',
-          height: '100vh',
-          gridTemplateColumns: '350px 1fr',
-          gap: '2rem',
-          //alignItems: 'start',
-          overflow: 'hidden',
-        }}
-      >
-        {/* left column -------------------------- */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          {/* new activity */}
-          <TimerPanel />
+        {/* Контент страницы (меняется при переходе) */}
+        <main style={{ flex: 1, overflow: 'auto', padding: '2rem' }}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/statistics" element={<StatisticsPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
+        </main>
 
-          <TasksToDo />
-        </div>
-
-
-        {/* right column -----------------*/}
-        <div style={{ display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          height: '100%',       
-          minHeight: 0,         
-          overflow: 'hidden'
-        }}>
-          {/* Блок статистики */}
-          <div style={{width: '100%', flexShrink: 0 }}>
-            <StatsPlaceholder />
-          </div>
-
-          {/* Блок записей*/}
-          <div style={{ flex: 1, minHeight: 0, width: '100%'  }}>
-            <RecordsList />
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </BrowserRouter>
   );
 }
 
