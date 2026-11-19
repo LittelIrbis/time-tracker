@@ -1,4 +1,4 @@
-import type { Task } from '../../types/api';
+import type { Task } from '../../shared/types/api';
 import { formatTime } from '../../shared/utils/time';
 import { LiveDuration } from '../timer/LiveDuration';
 

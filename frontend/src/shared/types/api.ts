@@ -10,3 +10,10 @@ export interface CreateTaskPayload {
   start: string;
   end: string | null;
 }
+
+export interface UpdateTaskResult {
+  operation_result: {
+    status: 'Ok' | 'Error' | 'NotFound';
+  };
+  task: Task | null;
+}

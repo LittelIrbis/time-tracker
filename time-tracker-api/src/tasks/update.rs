@@ -29,7 +29,7 @@ pub async fn update_task(
     Json(update_task): Json<UpdateTask>,
 ) -> Json<UpdateTaskResult> {
 
-    match sqlx::query_as::<_, Task>("UPDATE tasks SET name = COALESCE($2, name), start = COALESCE($3, start), \"end\" = \"end\" WHERE id = $1 RETURNING id, name, start, \"end\"")
+    match sqlx::query_as::<_, Task>("UPDATE tasks SET name = COALESCE($2, name), start = COALESCE($3, start), \"end\" = COALESCE($4, \"end\") WHERE id = $1 RETURNING id, name, start, \"end\"")
         .bind(update_task.id)
         .bind(update_task.new_name)
         .bind(update_task.new_start)

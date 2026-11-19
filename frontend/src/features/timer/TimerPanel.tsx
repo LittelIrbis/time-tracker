@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTasks, createTask } from '../../shared/api/tasks';
+import { getTasks, createTask, stopTask } from '../../shared/api/tasks';
 
 export function TimerPanel() {
   const queryClient = useQueryClient();
@@ -9,6 +9,7 @@ export function TimerPanel() {
   const [selectedTaskName, setSelectedTaskName] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
 
   const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: getTasks });
   const recentTasks = Array.from(new Set(tasks.map(t => t.name))).slice(0, 5);
@@ -37,18 +38,32 @@ export function TimerPanel() {
     }
   });
 
+  const stopMutation = useMutation({
+    mutationFn: (id: number) => stopTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setIsRunning(false);       
+      setActiveTaskId(null);     
+      setSelectedTaskName(null); 
+      setElapsedSeconds(0);      
+    }
+  });
+
   const handleStart = () => {
     if (!selectedTaskName) return;
     startMutation.mutate(selectedTaskName, {
-      onSuccess: () => {
+      onSuccess: (createdTask) => {
         setIsRunning(true);
         setElapsedSeconds(0);
+        setActiveTaskId(createdTask.id);
       }
     });
   };
 
   const handleStop = () => {
-    setIsRunning(false);
+    if (activeTaskId !== null) {
+      stopMutation.mutate(activeTaskId);
+    }
   };
 
   const handleReset = () => {
@@ -186,11 +201,11 @@ export function TimerPanel() {
       <div style={{ 
         flex: 1,                 // Занимает всё оставшееся место по центру
         display: 'flex', 
-        alignItems: 'center',    // Центрируем кнопки по вертикали
+        alignItems: 'center',
         justifyContent: 'center', 
         paddingBottom: '0.5rem' 
       }}>
-        {/* Пустышка для состояния 1 (чтобы карточка не прыгала) */}
+        {/*состояние 1*/}
         {state === 1 && <div />}
 
         {/* Кнопка Старт (состояние 2) */}

@@ -1,8 +1,8 @@
-import { Sidebar } from './features/navigation/Sidebar';
-import { TimerPanel } from './features/timer/TimerPanel';
-import { StatsPlaceholder } from './features/stats/StatsPlaceholder';
-import { RecordsList } from './features/tasks/RecordsList';
-import { TasksToDo } from './features/tasks/TasksToDo';
+import { Sidebar } from '../features/navigation/Sidebar';
+import { TimerPanel } from '../features/timer/TimerPanel';
+import { StatsPlaceholder } from '../features/stats/StatsPlaceholder';
+import { RecordsList } from '../features/tasks/RecordsList';
+import { TasksToDo } from '../features/tasks/TasksToDo';
 
 function App() {
   return (
