@@ -1,3 +1,4 @@
+// Task =========================================
 export interface Task {
   id: number;
   name: string;
@@ -16,4 +17,20 @@ export interface UpdateTaskResult {
     status: 'Ok' | 'Error' | 'NotFound';
   };
   task: Task | null;
+}
+
+// Project ======================================
+export interface Project {
+  id: number;
+  name: string;
+  color: string;
+  created_at: string;
+  default_deadline: string | null;
+  description: string | null;
+}
+export interface CreateProjectPayload {
+  name: string;
+  description?: string | null;
+  color?: string | null;
+  default_deadline?: string | null;
 }

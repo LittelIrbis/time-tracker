@@ -10,6 +10,7 @@ use sqlx::pool::Pool;
 
 mod tasks;
 mod app;
+mod projects;
 
 use tasks::list::list_tasks;
 use tasks::create::create_task;
@@ -29,6 +30,9 @@ fn create_router(app_state: Arc<AppState>) -> Router {
         .route("/tasks/update", routing::post(update_task))
         .route("/tasks/delete", routing::post(delete_task))
         .route("/health/live", routing::get(get_health_live))
+        .route("/projects/list", routing::get(projects::list::list_projects))
+        .route("/projects/create", routing::post(projects::create::create_project))
+        
         .with_state(app_state)
 }
 
